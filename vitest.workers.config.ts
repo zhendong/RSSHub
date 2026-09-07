@@ -2,9 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { cloudflareTest } from '@cloudflare/vitest-pool-workers';
-import type { Plugin } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import { defineConfig } from 'vitest/config';
+import { defineConfig, type Plugin } from 'vitest/config';
 
 // Resolve .worker.ts files instead of .ts files, same as tsdown-worker.config.ts
 function workerAliasPlugin(): Plugin {
@@ -56,9 +55,10 @@ export default defineConfig({
     plugins: [
         cloudflareTest({
             miniflare: {
-                compatibilityDate: '2025-06-17',
+                compatibilityDate: '2026-08-22',
                 compatibilityFlags: ['nodejs_compat'],
                 kvNamespaces: ['CACHE'],
+                modulesRules: [{ type: 'CompiledWasm', include: ['**/*.wasm'] }],
             },
         }),
         workerAliasPlugin(),
@@ -70,6 +70,6 @@ export default defineConfig({
         },
     },
     test: {
-        include: ['lib/**/*.worker.test.ts'],
+        include: ['lib/**/*.worker.test.ts', 'tests/**/*.worker.test.ts', 'lib/utils/parse-script-data.test.ts', 'lib/utils/parse-date-in-timezone.test.ts', 'tests/source-date-routes.test.ts'],
     },
 });
